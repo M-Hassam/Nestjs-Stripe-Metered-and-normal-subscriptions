@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Subscription Plans</title>
+</head>
+<body>
+  <h1>Available Plans</h1>
+  <div>
+    <% plans.forEach(plan => { %>
+      <div style="border:1px solid #ccc;padding:10px;margin-bottom:10px;">
+        <h2><%= plan.title %></h2>
+        <p><%= plan.description %></p>
+        <% if (plan.price > 0 || plan.is_metered) { %>
+          <form action="/subscriptions/start-subscription" method="GET">
+            <input type="hidden" name="priceId" value="<%= plan.stripe_price_id %>">
+            <input type="hidden" name="isMetered" value="<%= plan.is_metered %>">
+            <button type="submit">Buy Now</button>
+          </form>
+        <% } else { %>
+          <p><strong>Free Plan</strong></p>
+        <% } %>
+      </div>
+    <% }); %>
+  </div>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    // fetch /subscription/buy?priceId=abc&is_metered=true
+    // then use client_secret in stripe.confirmCardSetup()
+  </script>
+</body>
+</html>

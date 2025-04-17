@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Attach Payment Method</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    #card-element {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Attach Your Card</h2>
+  <form id="payment-form">
+    <div id="card-element"><!-- Stripe Element will go here --></div>
+    <button type="submit">Attach Card</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const stripe = Stripe('pk_test_51KgMq2I0URXVQb0taZbEjrG5NBC6MgqbLvFgReKNnPJ6kAIOkow6IZd9d4WiUtUKFP4xcBzGAtgc7QGzCV7McJvb00HW1mAZ3F'); // 👈 Replace with your actual Stripe publishable key
+    const elements = stripe.elements();
+    const card = elements.create('card');
+    card.mount('#card-element');
+
+    const clientSecret = '<%= client_secret %>'; // If you're using EJS, inject this from server
+
+    const form = document.getElementById('payment-form');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const { setupIntent, error } = await stripe.confirmCardSetup(clientSecret, {
+        payment_method: {
+          card: card,
+        },
+      });
+
+      if (error) {
+        resultDiv.textContent = 'Error: ' + error.message;
+      } else {
+        resultDiv.textContent = 'Card attached successfully!';
+        console.log('SetupIntent:', setupIntent);
+        // Optionally redirect to dashboard or save setupIntent.payment_method
+      }
+    });
+  </script>
+</body>
+</html>
